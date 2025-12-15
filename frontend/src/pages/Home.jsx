@@ -1,12 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { Navigate } from 'react-router-dom';
 import ServiceCard from '../components/ServiceCard';
+import AuthContext from '../context/AuthContext';
 
 const Home = () => {
+    const { user } = useContext(AuthContext);
     const [services, setServices] = useState([]);
     const [filteredServices, setFilteredServices] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    // Redirect provider to their dashboard if they land here
+    if (user && user.role === 'provider') {
+        return <Navigate to="/provider" replace />;
+    }
 
     // Filter states
     const [filters, setFilters] = useState({

@@ -43,6 +43,9 @@ export const AuthProvider = ({ children }) => {
             setUser(data);
             localStorage.setItem('userInfo', JSON.stringify(data));
             toast.success('Registration Successful');
+            if (data.role === 'admin') navigate('/admin-dashboard');
+            else if (data.role === 'provider') navigate('/provider');
+            else navigate('/');
             return true;
         } catch (error) {
             toast.error(error.response?.data?.message || 'Registration Failed');

@@ -6,12 +6,15 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import ProviderDashboard from './pages/ProviderDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import ServiceDetails from './pages/ServiceDetails';
 import BookingList from './pages/BookingList';
 import CustomerProfileLayout from './pages/CustomerProfileLayout';
 import Chat from './pages/Chat';
+import ProviderLayout from './pages/ProviderLayout';
+import ProviderServices from './pages/ProviderServices';
+import ProviderBookings from './pages/ProviderBookings';
+import ProviderHistory from './pages/ProviderHistory';
 import PrivateRoute from './components/PrivateRoute';
 
 function App() {
@@ -38,7 +41,13 @@ function App() {
         </Route>
         {/* Provider Routes */}
         <Route element={<PrivateRoute allowedRoles={['provider', 'admin']} />}>
-          <Route path="/provider" element={<ProviderDashboard />} />
+          <Route path="/provider" element={<ProviderLayout />}>
+            <Route index element={<Navigate to="services" replace />} />
+            <Route path="services" element={<ProviderServices />} />
+            <Route path="bookings" element={<ProviderBookings />} />
+            <Route path="history" element={<ProviderHistory />} />
+          </Route>
+          <Route path="/provider-dashboard" element={<Navigate to="/provider/services" replace />} />
         </Route>
 
         {/* Admin Routes */}

@@ -7,17 +7,18 @@ const Review = require("../models/Review");
 
 const getServices = async (req, res) => {
   try {
-    const keyword = req.query.keyword
-      ? {
-          title: {
-            $regex: req.query.keyword,
-            $options: "i",
-          },
-        }
-      : {};
+    const query = { isActive: true };
+
+    if (req.query.keyword) {
+      query.title = { $regex: req.query.keyword, $options: "i" };
+    }
+
+    if (req.query.provider) {
+      query.providerId = req.query.provider;
+    }
 
     // 1. Fetch services
-    const services = await Service.find({ ...keyword, isActive: true })
+    const services = await Service.find(query)
       .populate("providerId", "name email phone location serviceLocations")
       .sort({ createdAt: -1 })
       .lean(); // Convert to plain JS objects to modify them

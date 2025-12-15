@@ -1,13 +1,14 @@
 const express = require("express");
 const router = express.Router();
-const {
-  createReview,
-  getServiceReviews,
-} = require("../controllers/reviewController");
+const { createReview, getReviews } = require("../controllers/reviewController");
 const { protect } = require("../middleware/authMiddleware");
 
-router.route("/").post(protect, createReview);
+router.route("/").get(getReviews).post(protect, createReview);
 
-router.route("/service/:serviceId").get(getServiceReviews);
+// Keep this for backward compatibility if any component uses it, but reuse getReviews
+router.route("/service/:serviceId").get((req, res, next) => {
+  req.query.serviceId = req.params.serviceId;
+  getReviews(req, res);
+});
 
 module.exports = router;

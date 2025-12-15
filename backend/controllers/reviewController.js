@@ -50,15 +50,24 @@ const createReview = async (req, res) => {
 // @desc    Get reviews for a service
 // @route   GET /api/reviews/service/:serviceId
 // @access  Public
-const getServiceReviews = async (req, res) => {
-  const reviews = await Review.find({
-    serviceId: req.params.serviceId,
-    isVisible: true,
-  }).populate("customerId", "name");
-  res.json(reviews);
+const getReviews = async (req, res) => {
+  try {
+    const query = { isVisible: true };
+    if (req.query.serviceId) query.serviceId = req.query.serviceId;
+    if (req.query.provider) query.providerId = req.query.provider;
+
+    const reviews = await Review.find(query)
+      .populate("customerId", "name")
+      .populate("serviceId", "title")
+      .sort({ createdAt: -1 });
+
+    res.json(reviews);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 module.exports = {
   createReview,
-  getServiceReviews,
+  getReviews,
 };

@@ -11,7 +11,8 @@ const Home = () => {
     // Filter states
     const [filters, setFilters] = useState({
         location: '',
-        category: ''
+        category: '',
+        sort: ''
     });
 
     const categories = ['All', 'Plumbing', 'Cleaning', 'Tutoring', 'Electrician', 'Painter', 'Gardener', 'Other'];
@@ -63,6 +64,18 @@ const Home = () => {
             });
         }
 
+        // Apply Sorting
+        if (filters.sort) {
+            filtered.sort((a, b) => {
+                if (filters.sort === 'price_asc') {
+                    return a.price - b.price;
+                } else if (filters.sort === 'price_desc') {
+                    return b.price - a.price;
+                }
+                return 0;
+            });
+        }
+
         setFilteredServices(filtered);
     };
 
@@ -74,7 +87,8 @@ const Home = () => {
     const resetFilters = () => {
         setFilters({
             location: '',
-            category: ''
+            category: '',
+            sort: ''
         });
     };
 
@@ -130,6 +144,24 @@ const Home = () => {
                                 </select>
                             </div>
 
+                            {/* Divider */}
+                            <div className="hidden md:block h-8 w-px bg-gray-300"></div>
+
+                            {/* Sort By Price */}
+                            <div className="flex-1 px-4 py-3 w-full md:w-auto">
+                                <label className="text-xs text-gray-500 font-semibold">Price</label>
+                                <select
+                                    name="sort"
+                                    value={filters.sort}
+                                    onChange={handleFilterChange}
+                                    className="w-full text-gray-800 outline-none text-sm bg-transparent"
+                                >
+                                    <option value="">Sort by</option>
+                                    <option value="price_asc">Low to High</option>
+                                    <option value="price_desc">High to Low</option>
+                                </select>
+                            </div>
+
                             {/* Search Button */}
                             <button
                                 type="submit"
@@ -143,7 +175,7 @@ const Home = () => {
                     </form>
 
                     {/* Reset Button */}
-                    {(filters.location || filters.category) && (
+                    {(filters.location || filters.category || filters.sort) && (
                         <div className="text-center mt-4">
                             <button
                                 onClick={resetFilters}

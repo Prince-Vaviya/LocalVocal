@@ -66,15 +66,36 @@ const getServices = async (req, res) => {
 // @route   GET /api/services/:id
 // @access  Public
 const getServiceById = async (req, res) => {
-  const service = await Service.findById(req.params.id).populate(
-    "providerId",
-    "name email"
-  );
+  try {
+    const service = await Service.findById(req.params.id)
+      .populate("providerId", "name email phone location serviceLocations")
+      .lean();
 
-  if (service) {
-    res.json(service);
-  } else {
-    res.status(404).json({ message: "Service not found" });
+    if (service) {
+      // Calculate average rating
+      const ratings = await Review.aggregate([
+        { $match: { serviceId: service._id, isVisible: true } },
+        {
+          $group: {
+            _id: "$serviceId",
+            averageRating: { $avg: "$rating" },
+            reviewCount: { $sum: 1 },
+          },
+        },
+      ]);
+
+      const ratingInfo = ratings[0] || { averageRating: 0, reviewCount: 0 };
+
+      res.json({
+        ...service,
+        averageRating: parseFloat(ratingInfo.averageRating.toFixed(1)),
+        reviewCount: ratingInfo.reviewCount,
+      });
+    } else {
+      res.status(404).json({ message: "Service not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 

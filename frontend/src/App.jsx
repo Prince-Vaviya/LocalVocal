@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ProviderDashboard from './pages/ProviderDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import ServiceDetails from './pages/ServiceDetails';
 import PrivateRoute from './components/PrivateRoute';
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/service/:id" element={<ServiceDetails />} />
 
         {/* Protected Routes */}
         {/* Provider Routes */}

@@ -33,7 +33,7 @@
  
  ### 4.2 Customer Pages 
  #### Home 
- * Three fields : location, service category, service time 
+ * Three fields : location, service category
  * Service Listing 
  - * Service cards showing: 
  - * Provider name 

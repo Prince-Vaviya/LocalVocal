@@ -3,6 +3,8 @@ const Service = require("../models/Service");
 // @desc    Fetch all services (with optional filters)
 // @route   GET /api/services
 // @access  Public
+const Review = require("../models/Review");
+
 const getServices = async (req, res) => {
   try {
     const keyword = req.query.keyword
@@ -14,10 +16,47 @@ const getServices = async (req, res) => {
         }
       : {};
 
+    // 1. Fetch services
     const services = await Service.find({ ...keyword, isActive: true })
       .populate("providerId", "name email phone location serviceLocations")
-      .sort({ createdAt: -1 });
-    res.json(services);
+      .sort({ createdAt: -1 })
+      .lean(); // Convert to plain JS objects to modify them
+
+    // 2. Fetch ratings aggregation
+    const serviceIds = services.map((s) => s._id);
+    const ratings = await Review.aggregate([
+      { $match: { serviceId: { $in: serviceIds }, isVisible: true } },
+      {
+        $group: {
+          _id: "$serviceId",
+          averageRating: { $avg: "$rating" },
+          reviewCount: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // 3. Merge ratings into services
+    const ratingMap = {};
+    ratings.forEach((r) => {
+      ratingMap[r._id.toString()] = {
+        averageRating: r.averageRating,
+        reviewCount: r.reviewCount,
+      };
+    });
+
+    const servicesWithRatings = services.map((service) => {
+      const ratingInfo = ratingMap[service._id.toString()] || {
+        averageRating: 0,
+        reviewCount: 0,
+      };
+      return {
+        ...service,
+        averageRating: parseFloat(ratingInfo.averageRating.toFixed(1)), // Round to 1 decimal
+        reviewCount: ratingInfo.reviewCount,
+      };
+    });
+
+    res.json(servicesWithRatings);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

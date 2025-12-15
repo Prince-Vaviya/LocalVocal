@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -9,6 +9,9 @@ import Register from './pages/Register';
 import ProviderDashboard from './pages/ProviderDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import ServiceDetails from './pages/ServiceDetails';
+import BookingList from './pages/BookingList';
+import CustomerProfileLayout from './pages/CustomerProfileLayout';
+import Chat from './pages/Chat';
 import PrivateRoute from './components/PrivateRoute';
 
 function App() {
@@ -23,6 +26,16 @@ function App() {
         <Route path="/service/:id" element={<ServiceDetails />} />
 
         {/* Protected Routes */}
+        <Route element={<PrivateRoute allowedRoles={['customer', 'provider', 'admin']} />}>
+          <Route path="/profile" element={<CustomerProfileLayout />}>
+            <Route index element={<Navigate to="bookings" replace />} />
+            <Route path="bookings" element={<BookingList />} />
+          </Route>
+          {/* Redirect old bookings route if needed or just keep above for simplicity */}
+          <Route path="/bookings" element={<BookingList />} />
+          <Route path="/chat" element={<Chat />} />
+          <Route path="/chat/:userId" element={<Chat />} />
+        </Route>
         {/* Provider Routes */}
         <Route element={<PrivateRoute allowedRoles={['provider', 'admin']} />}>
           <Route path="/provider" element={<ProviderDashboard />} />

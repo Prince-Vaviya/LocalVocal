@@ -1,82 +1,86 @@
-const Chat = require("../models/Chat");
-const Booking = require("../models/Booking");
-
-// @desc    Get chat by booking ID (or create if not exists)
-// @route   GET /api/chats/:bookingId
-// @access  Private
-const getChatByBookingId = async (req, res) => {
-  const { bookingId } = req.params;
-
-  // Verify access
-  const booking = await Booking.findById(bookingId);
-  if (!booking) {
-    res.status(404).json({ message: "Booking not found" });
-    return;
-  }
-
-  if (
-    booking.customerId.toString() !== req.user._id.toString() &&
-    booking.providerId.toString() !== req.user._id.toString() &&
-    req.user.role !== "admin"
-  ) {
-    res.status(401).json({ message: "Not authorized to view this chat" });
-    return;
-  }
-
-  let chat = await Chat.findOne({ bookingId })
-    .populate("customerId", "name")
-    .populate("providerId", "name");
-
-  if (!chat) {
-    // Create new chat session if it doesn't exist
-    chat = await Chat.create({
-      bookingId,
-      customerId: booking.customerId,
-      providerId: booking.providerId,
-      messages: [],
-    });
-    // Re-fetch to populate if needed, or just return basic structure
-    chat = await Chat.findById(chat._id)
-      .populate("customerId", "name")
-      .populate("providerId", "name");
-  }
-
-  res.json(chat);
-};
+const Message = require("../models/Message");
+const User = require("../models/User");
 
 // @desc    Send a message
-// @route   POST /api/chats/:bookingId/message
+// @route   POST /api/chat
 // @access  Private
 const sendMessage = async (req, res) => {
-  const { bookingId } = req.params;
-  const { message } = req.body;
+  const { receiverId, message } = req.body;
 
-  const chat = await Chat.findOne({ bookingId });
+  try {
+    const newMessage = new Message({
+      senderId: req.user._id,
+      receiverId,
+      message,
+    });
 
-  if (chat) {
-    if (
-      chat.customerId.toString() !== req.user._id.toString() &&
-      chat.providerId.toString() !== req.user._id.toString()
-    ) {
-      res.status(401).json({ message: "Not authorized to send message" });
-      return;
+    const savedMessage = await newMessage.save();
+    res.status(201).json(savedMessage);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to send message" });
+  }
+};
+
+// @desc    Get messages between logged in user and another user
+// @route   GET /api/chat/:userId
+// @access  Private
+const getMessages = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const messages = await Message.find({
+      $or: [
+        { senderId: req.user._id, receiverId: userId },
+        { senderId: userId, receiverId: req.user._id },
+      ],
+    }).sort({ createdAt: 1 }); // Oldest first
+
+    res.json(messages);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch messages" });
+  }
+};
+
+// @desc    Get list of conversations (users chatted with)
+// @route   GET /api/chat/conversations
+// @access  Private
+const getConversations = async (req, res) => {
+  try {
+    // Find unique users communicating with current user
+    const messages = await Message.find({
+      $or: [{ senderId: req.user._id }, { receiverId: req.user._id }],
+    }).sort({ createdAt: -1 });
+
+    const userIds = new Set();
+    const conversations = [];
+
+    for (const msg of messages) {
+      const otherUserId =
+        msg.senderId.toString() === req.user._id.toString()
+          ? msg.receiverId.toString()
+          : msg.senderId.toString();
+
+      if (!userIds.has(otherUserId)) {
+        userIds.add(otherUserId);
+        const user = await User.findById(otherUserId).select("name email role");
+        if (user) {
+          conversations.push({
+            user,
+            lastMessage: msg.message,
+            timestamp: msg.createdAt,
+          });
+        }
+      }
     }
 
-    const newMessage = {
-      senderId: req.user._id,
-      message,
-      timestamp: Date.now(),
-    };
-
-    chat.messages.push(newMessage);
-    await chat.save();
-    res.json(chat);
-  } else {
-    res.status(404).json({ message: "Chat session not found" });
+    res.json(conversations);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch conversations" });
   }
 };
 
 module.exports = {
-  getChatByBookingId,
   sendMessage,
+  getMessages,
+  getConversations,
 };

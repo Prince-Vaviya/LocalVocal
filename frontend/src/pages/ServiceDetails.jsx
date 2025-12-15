@@ -17,37 +17,57 @@ const ServiceDetails = () => {
     const [loading, setLoading] = useState(true);
     const [bookingLoading, setBookingLoading] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
+    // Booking Modal State
+    const [showBookingModal, setShowBookingModal] = useState(false);
+    const [bookingStep, setBookingStep] = useState(1);
+    const [bookingData, setBookingData] = useState({
+        date: '',
+        time: '',
+        address: ''
+    });
 
-    const handleBooking = async () => {
+    const timeSlots = [
+        '09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM',
+        '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM'
+    ];
+
+    const openBookingModal = () => {
         if (!user) {
             toast.error('Please login to book a service');
             navigate('/login', { state: { from: `/service/${id}` } });
             return;
         }
-
         if (user.role === 'provider') {
             toast.error('Providers cannot book services');
             return;
         }
+        // Pre-fill address if available
+        setBookingData(prev => ({ ...prev, address: user.location?.city || '' }));
+        setShowBookingModal(true);
+        setBookingStep(1);
+    };
 
+    const handleBookingSubmit = async () => {
         try {
             setBookingLoading(true);
 
-            // Create booking
+            // Combine date and time
+            const scheduledAt = new Date(`${bookingData.date}T${convertTo24Hour(bookingData.time)}`);
+
             await axios.post('http://localhost:5001/api/bookings', {
                 serviceId: id,
                 providerId: service.providerId._id,
-                scheduledAt: new Date(Date.now() + 86400000).toISOString(), // Default: Tomorrow
-                address: user.location?.address || 'Default Address',
+                scheduledAt: scheduledAt.toISOString(),
+                address: bookingData.address,
                 price: service.price
             });
 
             setBookingLoading(false);
-            setShowSuccess(true);
+            setShowBookingModal(false); // Close input modal
+            setShowSuccess(true); // Show success animation
 
-            // Redirect after animation
             setTimeout(() => {
-                navigate('/'); // Or to /my-bookings later
+                navigate('/bookings');
             }, 3000);
 
         } catch (error) {
@@ -55,6 +75,31 @@ const ServiceDetails = () => {
             toast.error(error.response?.data?.message || 'Booking failed');
         }
     };
+
+    const convertTo24Hour = (time12h) => {
+        const [time, modifier] = time12h.split(' ');
+        let [hours, minutes] = time.split(':');
+        if (hours === '12') {
+            hours = modifier === 'PM' ? '12' : '00';
+        } else if (modifier === 'PM') {
+            hours = parseInt(hours, 10) + 12;
+        }
+        return `${hours}:${minutes}:00`;
+    };
+
+    const nextStep = () => {
+        if (bookingStep === 1 && (!bookingData.date || !bookingData.time)) {
+            toast.error("Please select date and time");
+            return;
+        }
+        if (bookingStep === 2 && !bookingData.address.trim()) {
+            toast.error("Please enter your address");
+            return;
+        }
+        setBookingStep(prev => prev + 1);
+    };
+
+    const prevStep = () => setBookingStep(prev => prev - 1);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -106,7 +151,7 @@ const ServiceDetails = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-12">
+        <div className="min-h-screen bg-gray-50 py-12 relative">
             <div className="container mx-auto px-4 max-w-6xl">
                 {/* Back Button */}
                 <button
@@ -117,9 +162,9 @@ const ServiceDetails = () => {
                 </button>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left Column: Service Info */}
+                    {/* Left Column */}
                     <div className="lg:col-span-2 space-y-6">
-                        {/* Main Service Card */}
+                        {/* Service Card */}
                         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
                             <div className="h-64 md:h-80 w-full relative">
                                 <img
@@ -131,121 +176,197 @@ const ServiceDetails = () => {
                                     <span className="text-2xl font-bold text-green-600">₹{service.price}</span>
                                 </div>
                             </div>
-
                             <div className="p-8">
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <h1 className="text-3xl font-bold text-gray-900 mb-2">{service.title}</h1>
-                                        <div className="flex items-center space-x-4 text-sm text-gray-600 mb-6">
-                                            <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-medium">
-                                                {service.category}
-                                            </span>
-                                            <span className="flex items-center">
-                                                <span className="mr-1">⏱</span> {service.durationMinutes} mins
-                                            </span>
-                                            <span className="flex items-center">
-                                                <span className="text-yellow-400 mr-1">★</span>
-                                                <span className="font-bold text-gray-900">{service.averageRating || 'New'}</span>
-                                                <span className="ml-1 text-gray-500">({service.reviewCount} reviews)</span>
-                                            </span>
-                                        </div>
-                                    </div>
+                                <h1 className="text-3xl font-bold text-gray-900 mb-2">{service.title}</h1>
+                                <div className="flex items-center space-x-4 text-sm text-gray-600 mb-6">
+                                    <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-medium">{service.category}</span>
+                                    <span>⏱ {service.durationMinutes} mins</span>
+                                    <span className="flex items-center text-yellow-500 font-bold">★ {service.averageRating || 'New'} ({service.reviewCount})</span>
                                 </div>
-
-                                <div className="prose max-w-none text-gray-600 leading-relaxed border-t pt-6">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-3">About this Service</h3>
+                                <div className="prose max-w-none text-gray-600 border-t pt-6">
+                                    <h3 className="font-semibold text-gray-900 mb-2">Description</h3>
                                     <p>{service.description}</p>
                                 </div>
-
-                                {/* Provider Info */}
                                 <div className="mt-8 border-t pt-6">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Service Provider</h3>
+                                    <h3 className="font-semibold text-gray-900 mb-4">Service Provider</h3>
                                     <div className="flex items-center bg-gray-50 p-4 rounded-xl">
-                                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
+                                        <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold shadow-sm">
                                             {getInitials(service.providerId?.name)}
                                         </div>
                                         <div className="ml-4">
-                                            <p className="text-lg font-bold text-gray-900">{service.providerId?.name}</p>
-                                            <div className="flex items-center text-gray-600 text-sm mt-1">
-                                                <span>📧 {service.providerId?.email}</span>
-                                                <span className="mx-2">•</span>
-                                                <span>📍 {service.providerId?.location?.city || 'Location N/A'}</span>
-                                            </div>
+                                            <p className="font-bold text-gray-900">{service.providerId?.name}</p>
+                                            <p className="text-sm text-gray-500">📍 {service.providerId?.location?.city || 'Location N/A'}</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Reviews Section */}
+                        {/* Reviews */}
                         <div className="bg-white rounded-2xl shadow-lg p-8">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-6">Customer Reviews</h2>
+                            <h2 className="text-2xl font-bold text-gray-900 mb-6">Reviews</h2>
                             {reviews.length > 0 ? (
                                 <div className="space-y-6">
                                     {reviews.map(review => (
-                                        <div key={review._id} className="border-b border-gray-100 last:border-0 pb-6 last:pb-0">
-                                            <div className="flex justify-between items-start mb-2">
+                                        <div key={review._id} className="border-b border-gray-100 last:border-0 pb-6">
+                                            <div className="flex justify-between mb-2">
                                                 <div className="flex items-center">
-                                                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-bold text-sm">
+                                                    <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-xs font-bold mr-3">
                                                         {getInitials(review.customerId?.name)}
                                                     </div>
-                                                    <div className="ml-3">
-                                                        <p className="font-semibold text-gray-900">{review.customerId?.name || 'Customer'}</p>
+                                                    <div>
+                                                        <p className="font-semibold text-sm">{review.customerId?.name}</p>
                                                         <p className="text-xs text-gray-500">{new Date(review.createdAt).toLocaleDateString()}</p>
                                                     </div>
                                                 </div>
-                                                <div className="flex bg-yellow-50 px-2 py-1 rounded">
-                                                    {[...Array(5)].map((_, i) => (
-                                                        <span key={i} className={`text-sm ${i < review.rating ? 'text-yellow-400' : 'text-gray-300'}`}>★</span>
-                                                    ))}
-                                                </div>
+                                                <span className="text-yellow-500 text-sm">{'★'.repeat(review.rating)}</span>
                                             </div>
-                                            <p className="text-gray-600 pl-14">{review.comment}</p>
+                                            <p className="text-gray-600 text-sm pl-11">{review.comment}</p>
                                         </div>
                                     ))}
                                 </div>
-                            ) : (
-                                <p className="text-center text-gray-500 py-8 italic">No reviews yet. Be the first to review!</p>
-                            )}
+                            ) : <p className="text-gray-500 italic">No reviews yet.</p>}
                         </div>
                     </div>
 
-                    {/* Right Column: Booking Card (Sticky) */}
+                    {/* Right Column: Sticky Booking Card */}
                     <div className="lg:col-span-1">
                         <div className="bg-white rounded-2xl shadow-xl p-6 sticky top-8 border border-gray-100">
                             <h3 className="text-xl font-bold text-gray-900 mb-4">Book this Service</h3>
-                            <div className="space-y-4 mb-6">
-                                <div className="flex justify-between text-gray-600">
-                                    <span>Price per service</span>
-                                    <span className="font-semibold text-gray-900">₹{service.price}</span>
-                                </div>
-                                <div className="flex justify-between text-gray-600">
-                                    <span>Duration</span>
-                                    <span className="font-semibold text-gray-900">{service.durationMinutes} mins</span>
-                                </div>
+                            <div className="space-y-4 mb-6 text-gray-600">
+                                <div className="flex justify-between"><span>Price</span><span className="font-bold text-gray-900">₹{service.price}</span></div>
+                                <div className="flex justify-between"><span>Duration</span><span className="font-bold text-gray-900">{service.durationMinutes} m</span></div>
                                 <div className="h-px bg-gray-200 my-2"></div>
-                                <div className="flex justify-between text-lg font-bold text-gray-900">
-                                    <span>Total</span>
-                                    <span>₹{service.price}</span>
-                                </div>
+                                <div className="flex justify-between text-lg font-bold text-gray-900"><span>Total</span><span>₹{service.price}</span></div>
                             </div>
-
                             <button
-                                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                                onClick={handleBooking}
+                                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all transform active:scale-95 disabled:opacity-50"
+                                onClick={openBookingModal}
                                 disabled={bookingLoading}
                             >
-                                {bookingLoading ? 'Processing...' : 'Book Service Now'}
+                                Book Service Now
                             </button>
-                            <p className="text-xs text-center text-gray-400 mt-4">
-                                Secure payment & satisfaction guaranteed
-                            </p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <BookingSuccess show={showSuccess} onClose={() => setShowSuccess(false)} />
+            {/* Booking Modal */}
+            {showBookingModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-fade-in-up">
+                        {/* Header */}
+                        <div className="bg-gray-50 px-6 py-4 border-b flex justify-between items-center">
+                            <h3 className="text-lg font-bold text-gray-800">
+                                {bookingStep === 1 && 'Select Date & Time'}
+                                {bookingStep === 2 && 'Enter Address'}
+                                {bookingStep === 3 && 'Confirm Booking'}
+                            </h3>
+                            <button onClick={() => setShowBookingModal(false)} className="text-gray-400 hover:text-gray-600">✕</button>
+                        </div>
+
+                        {/* Body */}
+                        <div className="p-6">
+                            {/* Step 1: Date & Time */}
+                            {bookingStep === 1 && (
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Select Date</label>
+                                        <input
+                                            type="date"
+                                            min={new Date().toISOString().split('T')[0]}
+                                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                            value={bookingData.date}
+                                            onChange={(e) => setBookingData({ ...bookingData, date: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Select Time</label>
+                                        <div className="grid grid-cols-3 gap-2">
+                                            {timeSlots.map(slot => (
+                                                <button
+                                                    key={slot}
+                                                    className={`py-2 px-1 text-sm rounded-lg border ${bookingData.time === slot ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                                                    onClick={() => setBookingData({ ...bookingData, time: slot })}
+                                                >
+                                                    {slot}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Step 2: Address */}
+                            {bookingStep === 2 && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Service Address</label>
+                                    <textarea
+                                        rows="4"
+                                        placeholder="Enter full address (House No, Street, Landmark...)"
+                                        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                                        value={bookingData.address}
+                                        onChange={(e) => setBookingData({ ...bookingData, address: e.target.value })}
+                                    ></textarea>
+                                </div>
+                            )}
+
+                            {/* Step 3: Summary */}
+                            {bookingStep === 3 && (
+                                <div className="bg-gray-50 p-4 rounded-xl space-y-3 text-sm">
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500">Service</span>
+                                        <span className="font-semibold text-gray-900">{service.title}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500">Date & Time</span>
+                                        <span className="font-semibold text-gray-900">{bookingData.date} at {bookingData.time}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500">Amount</span>
+                                        <span className="font-semibold text-green-600 text-lg">₹{service.price}</span>
+                                    </div>
+                                    <div className="border-t pt-2 mt-2">
+                                        <span className="text-gray-500 block mb-1">Address</span>
+                                        <p className="font-medium text-gray-900">{bookingData.address}</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Footer */}
+                        <div className="px-6 py-4 bg-gray-50 border-t flex justify-between">
+                            {bookingStep > 1 ? (
+                                <button
+                                    onClick={prevStep}
+                                    className="px-4 py-2 text-gray-600 hover:bg-gray-200 rounded-lg font-medium"
+                                >
+                                    Back
+                                </button>
+                            ) : <div></div>}
+
+                            {bookingStep < 3 ? (
+                                <button
+                                    onClick={nextStep}
+                                    className="px-6 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 shadow-md"
+                                >
+                                    Next
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={handleBookingSubmit}
+                                    disabled={bookingLoading}
+                                    className="px-6 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 shadow-md flex items-center"
+                                >
+                                    {bookingLoading ? 'Confirming...' : 'Confirm Booking'}
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <BookingSuccess show={showSuccess} />
         </div>
     );
 };

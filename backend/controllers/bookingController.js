@@ -79,14 +79,28 @@ const updateBookingStatus = async (req, res) => {
   const booking = await Booking.findById(req.params.id);
 
   if (booking) {
-    if (
-      req.user.role !== "admin" &&
-      booking.providerId.toString() !== req.user._id.toString()
-    ) {
+    const isProvider =
+      booking.providerId.toString() === req.user._id.toString();
+    const isCustomer =
+      booking.customerId.toString() === req.user._id.toString();
+    const isAdmin = req.user.role === "admin";
+
+    // Authorization check
+    if (!isAdmin && !isProvider && !isCustomer) {
       res
         .status(401)
-        .json({ message: "Not authorized to update this booking" });
+        .json({ message: "Not authorized to access this booking" });
       return;
+    }
+
+    // Role-specific status restrictions (Optional but good practice)
+    if (isCustomer) {
+      if (!["cancelled", "completed"].includes(status)) {
+        res
+          .status(400)
+          .json({ message: "Customers can only cancel or complete bookings" });
+        return;
+      }
     }
 
     booking.status = status;

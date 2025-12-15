@@ -1,13 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const {
-  getChatByBookingId,
   sendMessage,
+  getMessages,
+  getConversations,
 } = require("../controllers/chatController");
 const { protect } = require("../middleware/authMiddleware");
 
-router.route("/:bookingId").get(protect, getChatByBookingId);
-
-router.route("/:bookingId/message").post(protect, sendMessage);
+router.route("/").post(protect, sendMessage);
+router.route("/conversations").get(protect, getConversations);
+router.route("/:userId").get(protect, getMessages);
 
 module.exports = router;

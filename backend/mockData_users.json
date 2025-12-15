@@ -9,6 +9,7 @@
     "isVerified": true,
     "verificationStatus": "verified",
     "location": { "city": "Sanpada" },
+    "serviceLocations": ["Sanpada", "Vashi"],
     "createdAt": { "$date": "2024-01-15T10:30:00.000Z" },
     "updatedAt": { "$date": "2024-01-15T10:30:00.000Z" }
   },
@@ -22,6 +23,7 @@
     "isVerified": true,
     "verificationStatus": "verified",
     "location": { "city": "Vashi" },
+    "serviceLocations": ["Vashi", "Sanpada", "Kalyan"],
     "createdAt": { "$date": "2024-01-16T10:30:00.000Z" },
     "updatedAt": { "$date": "2024-01-16T10:30:00.000Z" }
   },
@@ -35,6 +37,7 @@
     "isVerified": true,
     "verificationStatus": "verified",
     "location": { "city": "Kalyan" },
+    "serviceLocations": ["Kalyan", "Vashi"],
     "createdAt": { "$date": "2024-01-17T10:30:00.000Z" },
     "updatedAt": { "$date": "2024-01-17T10:30:00.000Z" }
   },
@@ -48,6 +51,7 @@
     "isVerified": true,
     "verificationStatus": "verified",
     "location": { "city": "Buldhana" },
+    "serviceLocations": ["Buldhana"],
     "createdAt": { "$date": "2024-01-18T10:30:00.000Z" },
     "updatedAt": { "$date": "2024-01-18T10:30:00.000Z" }
   },
@@ -61,6 +65,7 @@
     "isVerified": true,
     "verificationStatus": "verified",
     "location": { "city": "Sanpada" },
+    "serviceLocations": ["Sanpada", "Vashi", "Kalyan"],
     "createdAt": { "$date": "2024-01-19T10:30:00.000Z" },
     "updatedAt": { "$date": "2024-01-19T10:30:00.000Z" }
   },
@@ -74,6 +79,7 @@
     "isVerified": true,
     "verificationStatus": "verified",
     "location": { "city": "Vashi" },
+    "serviceLocations": ["Vashi", "Sanpada"],
     "createdAt": { "$date": "2024-01-20T10:30:00.000Z" },
     "updatedAt": { "$date": "2024-01-20T10:30:00.000Z" }
   },

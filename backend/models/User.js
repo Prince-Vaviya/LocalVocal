@@ -40,6 +40,11 @@ const userSchema = new mongoose.Schema(
         required: false, // Optional initially
       },
     },
+    // Array of cities where provider offers services
+    serviceLocations: {
+      type: [String],
+      default: [],
+    },
   },
   {
     timestamps: true,

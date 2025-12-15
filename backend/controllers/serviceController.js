@@ -4,20 +4,23 @@ const Service = require("../models/Service");
 // @route   GET /api/services
 // @access  Public
 const getServices = async (req, res) => {
-  const keyword = req.query.keyword
-    ? {
-        title: {
-          $regex: req.query.keyword,
-          $options: "i",
-        },
-      }
-    : {};
+  try {
+    const keyword = req.query.keyword
+      ? {
+          title: {
+            $regex: req.query.keyword,
+            $options: "i",
+          },
+        }
+      : {};
 
-  const services = await Service.find({ ...keyword }).populate(
-    "providerId",
-    "name email"
-  );
-  res.json(services);
+    const services = await Service.find({ ...keyword, isActive: true })
+      .populate("providerId", "name email phone location serviceLocations")
+      .sort({ createdAt: -1 });
+    res.json(services);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 // @desc    Fetch single service

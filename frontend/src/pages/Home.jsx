@@ -11,9 +11,7 @@ const Home = () => {
     // Filter states
     const [filters, setFilters] = useState({
         location: '',
-        category: '',
-        date: '',
-        time: ''
+        category: ''
     });
 
     const categories = ['All', 'Plumbing', 'Cleaning', 'Tutoring', 'Electrician', 'Painter', 'Gardener', 'Other'];
@@ -57,11 +55,12 @@ const Home = () => {
             );
         }
 
-        // Filter by location (basic text match)
+        // Filter by location (check if location is in provider's serviceLocations)
         if (filters.location) {
-            filtered = filtered.filter(service =>
-                service.providerId?.location?.city?.toLowerCase().includes(filters.location.toLowerCase())
-            );
+            filtered = filtered.filter(service => {
+                const serviceLocations = service.providerId?.serviceLocations || [];
+                return serviceLocations.includes(filters.location);
+            });
         }
 
         setFilteredServices(filtered);
@@ -75,9 +74,7 @@ const Home = () => {
     const resetFilters = () => {
         setFilters({
             location: '',
-            category: '',
-            date: '',
-            time: ''
+            category: ''
         });
     };
 
@@ -133,36 +130,6 @@ const Home = () => {
                                 </select>
                             </div>
 
-                            {/* Divider */}
-                            <div className="hidden md:block h-8 w-px bg-gray-300"></div>
-
-                            {/* Date */}
-                            <div className="flex-1 px-4 py-3 w-full md:w-auto">
-                                <label className="text-xs text-gray-500 font-semibold">When</label>
-                                <input
-                                    type="date"
-                                    name="date"
-                                    value={filters.date}
-                                    onChange={handleFilterChange}
-                                    className="w-full text-gray-800 outline-none text-sm"
-                                />
-                            </div>
-
-                            {/* Divider */}
-                            <div className="hidden md:block h-8 w-px bg-gray-300"></div>
-
-                            {/* Time */}
-                            <div className="flex-1 px-4 py-3 w-full md:w-auto">
-                                <label className="text-xs text-gray-500 font-semibold">Time</label>
-                                <input
-                                    type="time"
-                                    name="time"
-                                    value={filters.time}
-                                    onChange={handleFilterChange}
-                                    className="w-full text-gray-800 outline-none text-sm"
-                                />
-                            </div>
-
                             {/* Search Button */}
                             <button
                                 type="submit"
@@ -176,7 +143,7 @@ const Home = () => {
                     </form>
 
                     {/* Reset Button */}
-                    {(filters.location || filters.category || filters.date || filters.time) && (
+                    {(filters.location || filters.category) && (
                         <div className="text-center mt-4">
                             <button
                                 onClick={resetFilters}

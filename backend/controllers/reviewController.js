@@ -67,7 +67,23 @@ const getReviews = async (req, res) => {
   }
 };
 
+const toggleFlagReview = async (req, res) => {
+  try {
+    const review = await Review.findById(req.params.id);
+    if (review) {
+      review.isFlagged = true; // Only allowing to flag, not unflag (admin does that)
+      await review.save();
+      res.json({ message: "Review flagged for admin" });
+    } else {
+      res.status(404).json({ message: "Review not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createReview,
   getReviews,
+  toggleFlagReview,
 };

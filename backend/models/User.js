@@ -43,7 +43,12 @@ const userSchema = new mongoose.Schema(
     // Array of cities where provider offers services
     serviceLocations: {
       type: [String],
+      enum: ["Sanpada", "Vashi", "Kalyan", "Buldhana"],
       default: [],
+    },
+    isVerified: {
+      type: Boolean,
+      default: false, // Providers need verification
     },
   },
   {
@@ -59,7 +64,7 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
 // Middleware to hash password before saving
 userSchema.pre("save", async function (next) {
   if (!this.isModified("passwordHash")) {
-    next();
+    return next();
   }
 
   const salt = await bcrypt.genSalt(10);

@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 
@@ -10,6 +10,13 @@ const Navbar = () => {
         logout();
         navigate('/login');
     };
+
+    const location = useLocation();
+
+    // Hide global navbar for admin routes (AdminLayout has its own)
+    if (location.pathname.startsWith('/admin')) {
+        return null;
+    }
 
     return (
         <nav className="bg-white shadow-md p-4 flex justify-between items-center">

@@ -6,7 +6,6 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import AdminDashboard from './pages/AdminDashboard';
 import ServiceDetails from './pages/ServiceDetails';
 import BookingList from './pages/BookingList';
 import CustomerProfileLayout from './pages/CustomerProfileLayout';
@@ -15,6 +14,10 @@ import ProviderLayout from './pages/ProviderLayout';
 import ProviderServices from './pages/ProviderServices';
 import ProviderBookings from './pages/ProviderBookings';
 import ProviderHistory from './pages/ProviderHistory';
+import AdminLayout from './pages/AdminLayout';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminProviders from './pages/AdminProviders';
+import AdminReports from './pages/AdminReports';
 import PrivateRoute from './components/PrivateRoute';
 
 function App() {
@@ -52,7 +55,13 @@ function App() {
 
         {/* Admin Routes */}
         <Route element={<PrivateRoute allowedRoles={['admin']} />}>
-          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="providers" element={<AdminProviders />} />
+            <Route path="reports" element={<AdminReports />} />
+          </Route>
+          <Route path="/admin-dashboard" element={<Navigate to="/admin/dashboard" replace />} />
         </Route>
 
       </Routes>

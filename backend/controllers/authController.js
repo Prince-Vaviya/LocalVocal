@@ -5,7 +5,8 @@ const generateToken = require("../utils/generateToken");
 // @route   POST /api/auth/register
 // @access  Public
 const registerUser = async (req, res) => {
-  const { name, email, password, phone, role, location } = req.body;
+  const { name, email, password, phone, role, location, serviceLocations } =
+    req.body;
 
   const userExists = await User.findOne({ email });
 
@@ -14,6 +15,9 @@ const registerUser = async (req, res) => {
     return;
   }
 
+  // Default verification: Customers and Admins are verified, Providers are NOT
+  const isVerified = role === "customer" || role === "admin";
+
   const user = await User.create({
     name,
     email,
@@ -21,6 +25,8 @@ const registerUser = async (req, res) => {
     phone,
     role,
     location,
+    isVerified,
+    serviceLocations: role === "provider" ? serviceLocations || [] : [],
   });
 
   if (user) {

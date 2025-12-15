@@ -11,9 +11,10 @@ const Home = () => {
     const [filteredServices, setFilteredServices] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // Redirect provider to their dashboard if they land here
-    if (user && user.role === 'provider') {
-        return <Navigate to="/provider" replace />;
+    // Redirect provider or admin to their dashboard if they land here
+    if (user) {
+        if (user.role === 'provider') return <Navigate to="/provider" replace />;
+        if (user.role === 'admin') return <Navigate to="/admin" replace />;
     }
 
     // Filter states

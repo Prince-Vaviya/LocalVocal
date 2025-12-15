@@ -36,6 +36,10 @@ const reviewSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    isFlagged: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

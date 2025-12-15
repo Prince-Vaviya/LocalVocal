@@ -13,8 +13,8 @@ const Navbar = () => {
 
     const location = useLocation();
 
-    // Hide global navbar for admin routes (AdminLayout has its own)
-    if (location.pathname.startsWith('/admin')) {
+    // Hide global navbar for admin and provider routes (they have their own layouts)
+    if (location.pathname.startsWith('/admin') || location.pathname.startsWith('/provider')) {
         return null;
     }
 

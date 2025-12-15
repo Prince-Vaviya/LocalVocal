@@ -80,15 +80,15 @@ const ProviderHistory = () => {
 
     return (
         <div>
-            <div className="flex space-x-6 border-b mb-6">
+            <div className="flex space-x-4 mb-8 bg-white border border-gray-200 p-1.5 rounded-xl w-fit shadow-sm">
                 <button
-                    className={`pb-3 font-semibold ${view === 'completed' ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-500'}`}
+                    className={`px-6 py-2.5 rounded-lg font-bold transition-all ${view === 'completed' ? 'bg-purple-50 text-purple-700 shadow-sm ring-1 ring-purple-100' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'}`}
                     onClick={() => setView('completed')}
                 >
                     Completed Orders
                 </button>
                 <button
-                    className={`pb-3 font-semibold ${view === 'reviews' ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-500'}`}
+                    className={`px-6 py-2.5 rounded-lg font-bold transition-all ${view === 'reviews' ? 'bg-purple-50 text-purple-700 shadow-sm ring-1 ring-purple-100' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'}`}
                     onClick={() => setView('reviews')}
                 >
                     My Reviews
@@ -98,23 +98,24 @@ const ProviderHistory = () => {
             {view === 'completed' && (
                 <div className="space-y-4">
                     {bookings.map(booking => (
-                        <div key={booking._id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex justify-between items-center">
+                        <div key={booking._id} className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all border border-gray-100 p-6 flex justify-between items-center group">
                             <div>
-                                <div className="flex items-center space-x-3 mb-1">
-                                    <h4 className="font-bold text-gray-900">{booking.serviceId?.title}</h4>
-                                    <span className={`px-2 py-0.5 rounded text-xs uppercase font-bold ${getStatusColor(booking.status)}`}>
+                                <div className="flex items-center space-x-3 mb-2">
+                                    <h4 className="font-bold text-gray-900 text-lg">{booking.serviceId?.title}</h4>
+                                    <span className={`px-3 py-1 rounded-full text-xs uppercase font-bold tracking-wide ${getStatusColor(booking.status)}`}>
                                         {booking.status}
                                     </span>
                                 </div>
-                                <p className="text-sm text-gray-500">
-                                    {booking.customerId?.name} • {new Date(booking.scheduledAt).toLocaleDateString()}
+                                <p className="text-sm text-gray-500 flex items-center">
+                                    <span className="mr-2">👤 {booking.customerId?.name}</span>
+                                    <span>📅 {new Date(booking.scheduledAt).toLocaleDateString()}</span>
                                 </p>
                             </div>
-                            <div className="flex items-center space-x-3">
-                                <span className="font-bold text-gray-900">₹{booking.price}</span>
+                            <div className="flex items-center space-x-4">
+                                <span className="font-bold text-gray-900 text-lg">₹{booking.price}</span>
                                 <button
                                     onClick={() => navigate(`/chat/${booking.customerId._id}`)}
-                                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-full"
+                                    className="p-3 text-white bg-blue-500 hover:bg-blue-600 rounded-full shadow-md transition-colors"
                                     title="Chat with Customer"
                                 >
                                     💬
@@ -122,40 +123,45 @@ const ProviderHistory = () => {
                             </div>
                         </div>
                     ))}
-                    {bookings.length === 0 && <p className="text-gray-500 text-center py-10">No history found.</p>}
+                    {bookings.length === 0 && <p className="text-gray-500 text-center py-10 bg-white rounded-2xl border border-dashed border-gray-200">No history found.</p>}
                 </div>
             )}
 
             {view === 'reviews' && (
-                <div className="space-y-4">
+                <div className="space-y-6">
                     {reviews.map(review => (
-                        <div key={review._id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-                            <div className="flex justify-between items-start mb-2">
+                        <div key={review._id} className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all border border-gray-100 p-6">
+                            <div className="flex justify-between items-start mb-4">
                                 <div className="flex items-center">
-                                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center font-bold text-xs mr-3">
+                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-100 to-indigo-100 flex items-center justify-center font-bold text-purple-700 mr-4 shadow-sm">
                                         {review.customerId?.name?.[0] || 'C'}
                                     </div>
                                     <div>
-                                        <p className="font-semibold text-gray-900 text-sm">{review.customerId?.name}</p>
-                                        <div className="text-yellow-400 text-xs">
-                                            {'★'.repeat(review.rating)} <span className="text-gray-400 text-xs ml-1">({review.rating}/5)</span>
+                                        <p className="font-bold text-gray-900">{review.customerId?.name}</p>
+                                        <div className="flex items-center space-x-1">
+                                            <div className="text-yellow-400 text-sm">
+                                                {'★'.repeat(review.rating)}
+                                            </div>
+                                            <span className="text-gray-400 text-xs">({review.rating}/5)</span>
                                         </div>
                                     </div>
                                 </div>
-                                <span className="text-gray-400 text-xs">{new Date(review.createdAt).toLocaleDateString()}</span>
+                                <span className="text-gray-400 text-xs bg-gray-50 px-2 py-1 rounded-md">{new Date(review.createdAt).toLocaleDateString()}</span>
                             </div>
-                            <p className="text-gray-600 text-sm italic border-l-2 border-gray-200 pl-3 mb-3">"{review.comment}"</p>
-                            <p className="text-xs text-gray-400 mb-2">Service: {review.serviceId?.title}</p>
+                            <p className="text-gray-600 text-sm italic border-l-4 border-purple-200 pl-4 mb-4 leading-relaxed">"{review.comment}"</p>
+                            <div className="flex justify-between items-center pt-4 border-t border-gray-50">
+                                <p className="text-xs text-gray-400">Service: <span className="text-gray-700 font-medium">{review.serviceId?.title}</span></p>
 
-                            <button
-                                onClick={() => handleFlag(review._id)}
-                                className="text-xs text-red-400 hover:text-red-600 font-medium transition-colors"
-                            >
-                                {review.isFlagged ? '🚩 Flagged for Review' : '⚐ Flag for Admin Review'}
-                            </button>
+                                <button
+                                    onClick={() => handleFlag(review._id)}
+                                    className={`text-xs font-medium px-3 py-1 rounded-full border transition-colors ${review.isFlagged ? 'text-red-600 border-red-200 bg-red-50' : 'text-gray-400 border-gray-200 hover:text-red-500 hover:border-red-200'}`}
+                                >
+                                    {review.isFlagged ? '🚩 Flagged' : '⚐ Report'}
+                                </button>
+                            </div>
                         </div>
                     ))}
-                    {reviews.length === 0 && <p className="text-gray-500 text-center py-10">No reviews yet.</p>}
+                    {reviews.length === 0 && <p className="text-gray-500 text-center py-10 bg-white rounded-2xl border border-dashed border-gray-200">No reviews yet.</p>}
                 </div>
             )}
         </div>

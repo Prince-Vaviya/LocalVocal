@@ -48,7 +48,7 @@ const ProviderBookings = () => {
 
             <div className="space-y-4">
                 {bookings.map(booking => (
-                    <div key={booking._id} className="bg-white rounded-xl shadow-sm border border-orange-100 p-6 flex flex-col md:flex-row justify-between items-start md:items-center">
+                    <div key={booking._id} className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow border border-orange-100 p-6 flex flex-col md:flex-row justify-between items-start md:items-center">
                         <div className="mb-4 md:mb-0">
                             <div className="flex items-center space-x-3 mb-2">
                                 <h3 className="font-bold text-lg text-gray-900">{booking.serviceId?.title}</h3>
@@ -68,7 +68,7 @@ const ProviderBookings = () => {
                             </button>
                             <button
                                 onClick={() => handleAction(booking._id, 'accepted')}
-                                className="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium shadow-md transition-colors"
+                                className="px-5 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 font-medium shadow-md transition-all transform hover:-translate-y-0.5"
                             >
                                 Accept
                             </button>

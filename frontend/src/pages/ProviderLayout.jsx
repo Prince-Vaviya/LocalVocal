@@ -19,51 +19,55 @@ const ProviderLayout = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
-            <header className="bg-white shadow-sm border-b z-10 sticky top-0">
-                <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-                    <h1 className="text-xl font-bold text-gray-800">Provider Dashboard</h1>
-                    <div className="flex items-center space-x-4">
-                        <span className="text-gray-600 font-medium">Hello, {user?.name}</span>
-                        <button onClick={handleLogout} className="text-red-600 font-medium hover:text-red-700">Logout</button>
-                    </div>
-                </div>
-            </header>
-
-            <div className="container mx-auto px-6 py-8 flex-1 flex flex-col md:flex-row gap-6">
-                {/* Sidebar */}
-                <aside className="w-full md:w-64 bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-fit md:sticky md:top-24">
-                    <div className="mb-6 flex flex-col items-center">
-                        <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 text-2xl font-bold mb-3">
-                            {user?.name?.charAt(0).toUpperCase()}
-                        </div>
-                        <h2 className="font-bold text-gray-800">{user?.name}</h2>
-                        <p className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded-full mt-1">● Active Provider</p>
+            <nav className="bg-white shadow-md sticky top-0 z-50 border-b border-purple-100">
+                <div className="container mx-auto px-6 py-3 flex flex-col md:flex-row justify-between items-center gap-4 md:gap-0">
+                    {/* Branding */}
+                    <div className="flex items-center gap-3">
+                        <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-blue-600 tracking-tight">LocalVocal</span>
+                        <span className="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wider border border-purple-200">Provider</span>
                     </div>
 
-                    <nav className="space-y-1">
+                    {/* Navigation Links */}
+                    <div className="flex bg-gray-100 p-1.5 rounded-xl border border-gray-200 overflow-x-auto max-w-full">
                         {sidebarLinks.map((link) => (
                             <NavLink
                                 key={link.path}
                                 to={link.path}
                                 className={({ isActive }) =>
-                                    `flex items-center px-4 py-3 rounded-lg transition-all font-medium ${isActive
-                                        ? 'bg-purple-50 text-purple-700'
-                                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                    `flex items-center px-4 py-2 rounded-lg transition-all font-bold whitespace-nowrap ${isActive
+                                        ? 'bg-white text-purple-700 shadow-sm ring-1 ring-black/5'
+                                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/50'
                                     }`
                                 }
                             >
-                                <span className="mr-3">{link.icon}</span>
+                                <span className="mr-2 text-lg">{link.icon}</span>
                                 {link.name}
                             </NavLink>
                         ))}
-                    </nav>
-                </aside>
+                    </div>
 
-                {/* Main Content */}
-                <main className="flex-1">
-                    <Outlet />
-                </main>
-            </div>
+                    {/* User Profile & Logout */}
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 bg-gradient-to-r from-purple-50 to-blue-50 px-3 py-1.5 rounded-full border border-purple-100/50">
+                            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-purple-600 font-bold shadow-sm border border-purple-100">
+                                {user?.name?.charAt(0).toUpperCase()}
+                            </div>
+                            <span className="text-gray-700 font-medium text-sm hidden lg:block">{user?.name}</span>
+                        </div>
+                        <button
+                            onClick={handleLogout}
+                            className="bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 px-4 py-2 rounded-full font-medium transition-colors text-sm"
+                        >
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </nav>
+
+            {/* Main Content */}
+            <main className="flex-1 container mx-auto px-4 md:px-8 py-8 animate-fade-in-up">
+                <Outlet />
+            </main>
         </div>
     );
 };

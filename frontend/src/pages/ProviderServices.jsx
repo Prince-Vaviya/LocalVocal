@@ -68,7 +68,7 @@ const ProviderServices = () => {
                 <h2 className="text-2xl font-bold text-gray-800">My Services</h2>
                 <button
                     onClick={handleAddNew}
-                    className="bg-purple-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-purple-700 shadow-md transition-all flex items-center"
+                    className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-2 rounded-full font-medium hover:from-purple-700 hover:to-indigo-700 shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center"
                 >
                     <span className="text-xl mr-2">+</span> Add New Service
                 </button>
@@ -76,7 +76,7 @@ const ProviderServices = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {services.map(service => (
-                    <div key={service._id} className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow overflow-hidden relative group">
+                    <div key={service._id} className="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden relative group border border-gray-100">
                         <div className="relative h-48">
                             <img
                                 src={getCategoryImage(service.category)}

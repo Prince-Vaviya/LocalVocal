@@ -14,13 +14,18 @@ const Navbar = () => {
     const location = useLocation();
 
     // Hide global navbar for admin and provider routes (they have their own layouts)
-    if (location.pathname.startsWith('/admin') || location.pathname.startsWith('/provider')) {
+    if (location.pathname.startsWith('/admin') || location.pathname.startsWith('/provider') || location.pathname.startsWith('/profile')) {
         return null;
     }
 
     return (
         <nav className="bg-white shadow-md p-4 flex justify-between items-center">
-            <Link to="/" className="text-xl font-bold text-blue-600">LocalVocal</Link>
+            <div className="container mx-auto px-6 py-4 flex justify-start items-center">
+            <Link to="/admin/dashboard" className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent hover:opacity-80 transition-opacity">
+                LocalVocal
+            </Link>
+            <span className="text-xm bg-green-100 text-green-600 mx-3 px-2 py-1 rounded-full uppercase border border-green-200 font-bold">Customer</span>
+            </div>
             <div>
                 {user ? (
                     <div className="flex items-center gap-4">

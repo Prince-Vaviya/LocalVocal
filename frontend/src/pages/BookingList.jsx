@@ -59,64 +59,70 @@ const BookingList = () => {
 
     return (
         <div>
-            <h1 className="text-2xl font-bold text-gray-800 mb-6">My Bookings</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-8 bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent">My Bookings</h1>
 
             {bookings.length === 0 ? (
-                <div className="text-center py-10">
-                    <p className="text-gray-500">No bookings found.</p>
-                    <button onClick={() => navigate('/')} className="mt-4 text-blue-600 hover:underline">Browse Services</button>
+                <div className="text-center py-16 bg-white rounded-3xl border border-dashed border-gray-200">
+                    <div className="text-6xl mb-4">📅</div>
+                    <p className="text-gray-500 text-lg mb-6">No bookings found yet.</p>
+                    <button
+                        onClick={() => navigate('/')}
+                        className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+                    >
+                        Browse Services
+                    </button>
                 </div>
             ) : (
-                <div className="space-y-4">
+                <div className="space-y-6">
                     {bookings.map(booking => (
-                        <div key={booking._id} className="bg-white rounded-xl border border-gray-100 p-6 flex flex-col md:flex-row justify-between items-start md:items-center hover:border-blue-100 transition-colors">
+                        <div key={booking._id} className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 p-6 flex flex-col md:flex-row justify-between items-start md:items-center group">
                             {/* Booking Info */}
-                            <div className="mb-4 md:mb-0 w-full md:w-3/5">
-                                <div className="flex items-center space-x-3 mb-2">
-                                    <h3 className="font-bold text-lg text-gray-900">{booking.serviceId?.title || 'Service Unavailable'}</h3>
-                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${getStatusColor(booking.status)}`}>
+                            <div className="mb-6 md:mb-0 w-full md:w-3/5">
+                                <div className="flex items-center space-x-4 mb-3">
+                                    <h3 className="font-bold text-xl text-gray-900 group-hover:text-blue-600 transition-colors">{booking.serviceId?.title || 'Service Unavailable'}</h3>
+                                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-sm ${getStatusColor(booking.status)}`}>
                                         {booking.status}
                                     </span>
                                 </div>
-                                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-600">
-                                    <p><span className="font-medium">Provider:</span> {booking.providerId?.name}</p>
-                                    <p><span className="font-medium">Price:</span> ₹{booking.price}</p>
-                                    <p className="col-span-2"><span className="font-medium">Date:</span> {new Date(booking.scheduledAt).toLocaleString()}</p>
-                                    <p className="col-span-2 truncate"><span className="font-medium">Address:</span> {booking.address}</p>
+                                <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-600">
+                                    <p className="flex items-center"><span className="w-5 text-center mr-2">👤</span> <span className="font-medium text-gray-900">{booking.providerId?.name}</span></p>
+                                    <p className="flex items-center"><span className="w-5 text-center mr-2">💰</span> <span className="font-bold text-gray-900">₹{booking.price}</span></p>
+                                    <p className="col-span-2 flex items-center"><span className="w-5 text-center mr-2">📅</span> {new Date(booking.scheduledAt).toLocaleString()}</p>
+                                    <p className="col-span-2 flex items-center truncate"><span className="w-5 text-center mr-2">📍</span> {booking.address}</p>
                                 </div>
                             </div>
 
                             {/* Actions */}
-                            <div className="flex flex-col space-y-2 w-full md:w-auto">
+                            <div className="flex flex-col space-y-3 w-full md:w-auto min-w-[140px]">
                                 <button
-                                    className="px-4 py-2 border border-blue-600 text-blue-600 rounded-lg text-sm font-semibold hover:bg-blue-50 transition-colors"
+                                    className="px-5 py-2.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-xl text-sm font-bold transition-colors flex items-center justify-center"
                                     onClick={() => navigate(`/chat/${booking.providerId._id}`)}
                                 >
-                                    Chat
+                                    💬 Chat Provider
                                 </button>
 
                                 {booking.status === 'pending' && (
                                     <button
                                         onClick={() => handleStatusUpdate(booking._id, 'cancelled')}
-                                        className="px-4 py-2 border border-red-500 text-red-500 rounded-lg text-sm font-semibold hover:bg-red-50 transition-colors"
+                                        className="px-5 py-2.5 border border-red-200 text-red-500 hover:bg-red-50 hover:border-red-300 rounded-xl text-sm font-bold transition-all flex items-center justify-center"
                                     >
-                                        Cancel Booking
+                                        ✕ Cancel
                                     </button>
                                 )}
 
                                 {booking.status === 'accepted' && (
                                     <button
                                         onClick={() => handleStatusUpdate(booking._id, 'completed')}
-                                        className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-semibold hover:bg-green-700 transition-colors"
+                                        className="px-5 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl text-sm font-bold hover:shadow-lg hover:scale-[1.02] transition-all flex items-center justify-center"
                                     >
-                                        Mark Completed
+                                        ✓ Mark Done
                                     </button>
                                 )}
 
                                 {booking.status === 'completed' && (
                                     <button
                                         onClick={() => setSelectedBookingForReview(booking)}
-                                        className="px-4 py-2 bg-yellow-400 text-white rounded-lg text-sm font-semibold hover:bg-yellow-500 transition-colors shadow-sm"
+                                        className="px-5 py-2.5 bg-gradient-to-r from-yellow-400 to-amber-500 text-white rounded-xl text-sm font-bold hover:shadow-lg hover:scale-[1.02] transition-all flex items-center justify-center"
                                     >
                                         ⭐ Rate Service
                                     </button>

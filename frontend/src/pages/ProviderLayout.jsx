@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
 const ProviderLayout = () => {
@@ -23,7 +23,7 @@ const ProviderLayout = () => {
                 <div className="container mx-auto px-6 py-3 flex flex-col md:flex-row justify-between items-center gap-4 md:gap-0">
                     {/* Branding */}
                     <div className="flex items-center gap-3">
-                        <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-blue-600 tracking-tight">LocalVocal</span>
+                        <Link to="/provider/services" className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-blue-600 tracking-tight hover:opacity-80 transition-opacity">LocalVocal</Link>
                         <span className="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wider border border-purple-200">Provider</span>
                     </div>
 

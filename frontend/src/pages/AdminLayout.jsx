@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
 const AdminLayout = () => {
@@ -21,9 +21,12 @@ const AdminLayout = () => {
         <div className="min-h-screen bg-gray-50 flex flex-col">
             <nav className="bg-white shadow-md sticky top-0 z-50">
                 <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-                    <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                        LocalVocal <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full uppercase ml-1 border border-red-200">Admin</span>
-                    </h1>
+                    <div className="flex items-center gap-2">
+                        <Link to="/admin/dashboard" className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent hover:opacity-80 transition-opacity">
+                            LocalVocal
+                        </Link>
+                        <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full uppercase border border-red-200 font-bold">Admin</span>
+                    </div>
 
                     <div className="hidden md:flex space-x-6 items-center">
                         {navLinks.map((link) => (

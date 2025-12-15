@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Review = require("../models/Review");
 const Booking = require("../models/Booking");
+const Service = require("../models/Service");
 
 // @desc    Get all unverified providers
 // @route   GET /api/admin/providers
@@ -106,46 +107,30 @@ const deleteReview = async (req, res) => {
 // @access  Private/Admin
 const getAdminStats = async (req, res) => {
   try {
-    // Aggregation for Location Stats: Completed vs Cancelled
-    /*
-      Output format needed:
-      [
-        { location: 'Sanpada', completed: 10, cancelled: 2 },
-        { location: 'Vashi', completed: 15, cancelled: 5 },
-        ...
-      ]
-    */
+    // 1. Waitlist: Unverified Providers
+    const waitlistCount = await User.countDocuments({
+      role: "provider",
+      isVerified: false,
+    });
 
-    // We need to join with User (provider) or maybe just look at address text?
-    // Actually bookings have addresses. Let's try to group by 'address' if it matches our enum locations.
-    // Or better, use provider's location if stored on booking?
-    // Booking schema has providerId. Provider has location.
-    // But user might want location of SERVICE delivery. Booking has 'address'.
-    // Address is free text. This is hard to aggregate perfectly unless we regex match keywords like 'Sanpada', 'Vashi'.
-    // Let's do a simple regex match for the known locations.
+    // 2. Total Services: All services
+    const activeServicesCount = await Service.countDocuments({});
 
-    const locations = ["Sanpada", "Vashi", "Kalyan", "Buldhana"];
-    const stats = [];
+    // 3. Revenue: Sum of price for completed bookings
+    const revenueAggregation = await Booking.aggregate([
+      { $match: { status: "completed" } },
+      { $group: { _id: null, total: { $sum: "$price" } } },
+    ]);
+    const totalRevenue =
+      revenueAggregation.length > 0 ? revenueAggregation[0].total : 0;
 
-    for (const loc of locations) {
-      const completedCount = await Booking.countDocuments({
-        status: "completed",
-        address: { $regex: loc, $options: "i" },
-      });
-      const cancelledCount = await Booking.countDocuments({
-        status: "cancelled",
-        address: { $regex: loc, $options: "i" },
-      });
-
-      stats.push({
-        name: loc,
-        completed: completedCount,
-        cancelled: cancelledCount,
-      });
-    }
-
-    res.json(stats);
+    res.json({
+      waitlist: waitlistCount,
+      services: activeServicesCount,
+      revenue: totalRevenue,
+    });
   } catch (error) {
+    console.error("Error fetching stats:", error);
     res.status(500).json({ message: "Error fetching stats" });
   }
 };

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -61,6 +62,19 @@ const ProviderHistory = () => {
             case 'completed': return 'bg-green-100 text-green-800';
             case 'cancelled': return 'bg-red-100 text-red-800';
             default: return 'bg-gray-100';
+        }
+    };
+
+    const handleFlag = async (reviewId) => {
+        try {
+            const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+            const config = {
+                headers: { Authorization: `Bearer ${userInfo.token}` }
+            };
+            await axios.put(`http://localhost:5001/api/reviews/${reviewId}/flag`, {}, config);
+            toast.success('Review flagged for admin');
+        } catch (error) {
+            toast.error('Failed to flag review');
         }
     };
 
@@ -133,8 +147,11 @@ const ProviderHistory = () => {
                             <p className="text-gray-600 text-sm italic border-l-2 border-gray-200 pl-3 mb-3">"{review.comment}"</p>
                             <p className="text-xs text-gray-400 mb-2">Service: {review.serviceId?.title}</p>
 
-                            <button className="text-xs text-red-400 hover:text-red-600 font-medium">
-                                ⚐ Flag for Admin Review
+                            <button
+                                onClick={() => handleFlag(review._id)}
+                                className="text-xs text-red-400 hover:text-red-600 font-medium transition-colors"
+                            >
+                                {review.isFlagged ? '🚩 Flagged for Review' : '⚐ Flag for Admin Review'}
                             </button>
                         </div>
                     ))}

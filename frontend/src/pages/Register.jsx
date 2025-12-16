@@ -21,7 +21,10 @@ const Register = () => {
         e.preventDefault();
         const success = await register(formData);
         if (success) {
-            navigate('/');
+            const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+            if (userInfo?.role === 'admin') navigate('/admin');
+            else if (userInfo?.role === 'provider') navigate('/provider');
+            else navigate('/profile');
         }
     };
 

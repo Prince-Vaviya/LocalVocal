@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import API_URL from '../config';
 
 const ReviewModal = ({ booking, onClose, onSuccess }) => {
     const [rating, setRating] = useState(5);
@@ -11,7 +12,7 @@ const ReviewModal = ({ booking, onClose, onSuccess }) => {
         e.preventDefault();
         setLoading(true);
         try {
-            await axios.post('http://localhost:5001/api/reviews', {
+            await axios.post(`${API_URL}/reviews`, {
                 bookingId: booking._id,
                 serviceId: booking.serviceId._id,
                 providerId: booking.providerId._id,

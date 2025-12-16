@@ -4,6 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import ReviewModal from '../components/ReviewModal';
+import API_URL from '../config';
 
 const BookingList = () => {
     const { user } = useContext(AuthContext);
@@ -14,7 +15,7 @@ const BookingList = () => {
 
     const fetchBookings = async () => {
         try {
-            const res = await axios.get('http://localhost:5001/api/bookings');
+            const res = await axios.get(`${API_URL}/bookings`);
             // Sort by date desc
             const sorted = res.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
             setBookings(sorted);
@@ -31,7 +32,7 @@ const BookingList = () => {
 
     const handleStatusUpdate = async (bookingId, newStatus) => {
         try {
-            await axios.put(`http://localhost:5001/api/bookings/${bookingId}/status`, { status: newStatus });
+            await axios.put(`${API_URL}/bookings/${bookingId}/status`, { status: newStatus });
             toast.success(`Booking ${newStatus}`);
             fetchBookings(); // Refresh list
 

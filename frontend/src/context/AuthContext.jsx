@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import API_URL from '../config';
 
 export const AuthContext = createContext();
 
@@ -19,7 +20,7 @@ export const AuthProvider = ({ children }) => {
     const login = async (email, password) => {
         try {
             const { data } = await axios.post(
-                'http://localhost:5001/api/auth/login',
+                `${API_URL}/auth/login`,
                 { email, password }
             );
 
@@ -36,7 +37,7 @@ export const AuthProvider = ({ children }) => {
     const register = async (userData) => {
         try {
             const { data } = await axios.post(
-                'http://localhost:5001/api/auth/register',
+                `${API_URL}/auth/register`,
                 userData
             );
 

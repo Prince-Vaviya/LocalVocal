@@ -3,6 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import API_URL from '../config';
 
 const ProviderHistory = () => {
     const { user } = useContext(AuthContext);
@@ -20,7 +21,7 @@ const ProviderHistory = () => {
 
     const fetchBookings = async () => {
         try {
-            const res = await axios.get('http://localhost:5001/api/bookings');
+            const res = await axios.get(`${API_URL}/bookings`);
             // Filter accepted, completed, cancelled
             const history = res.data.filter(b => ['completed', 'cancelled', 'accepted'].includes(b.status));
             setBookings(history.reverse());
@@ -49,7 +50,7 @@ const ProviderHistory = () => {
             // Better: update reviewController to support ?provider=ID
 
             // Assume I will update backend next step.
-            const res = await axios.get(`http://localhost:5001/api/reviews?provider=${user._id}`);
+            const res = await axios.get(`${API_URL}/reviews?provider=${user._id}`);
             setReviews(res.data);
         } catch (error) {
             console.error("Error reviews", error);
@@ -71,7 +72,7 @@ const ProviderHistory = () => {
             const config = {
                 headers: { Authorization: `Bearer ${userInfo.token}` }
             };
-            await axios.put(`http://localhost:5001/api/reviews/${reviewId}/flag`, {}, config);
+            await axios.put(`${API_URL}/reviews/${reviewId}/flag`, {}, config);
             toast.success('Review flagged for admin');
         } catch (error) {
             toast.error('Failed to flag review');

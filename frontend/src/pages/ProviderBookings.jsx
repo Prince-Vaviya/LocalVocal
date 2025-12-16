@@ -3,6 +3,7 @@ import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import API_URL from '../config';
 
 const ProviderBookings = () => {
     const { user } = useContext(AuthContext);
@@ -15,7 +16,7 @@ const ProviderBookings = () => {
             // Fetch all bookings for provider (backend usually returns all)
             // We really need a specific endpoint or just filter on client side if getBookings returns my bookings based on token
             // Based on checking bookingController earlier, getBookings returns bookings where providerId matches user
-            const res = await axios.get('http://localhost:5001/api/bookings');
+            const res = await axios.get(`${API_URL}/bookings`);
             // Filter only pending requests for this "Order Bookings" page
             const pending = res.data.filter(b => b.status === 'pending');
             setBookings(pending);
@@ -32,7 +33,7 @@ const ProviderBookings = () => {
 
     const handleAction = async (id, status) => {
         try {
-            await axios.put(`http://localhost:5001/api/bookings/${id}/status`, { status });
+            await axios.put(`${API_URL}/bookings/${id}/status`, { status });
             toast.success(`Booking ${status}`);
             fetchBookings();
         } catch (error) {

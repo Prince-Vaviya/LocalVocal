@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { Navigate } from 'react-router-dom';
 import ServiceCard from '../components/ServiceCard';
 import AuthContext from '../context/AuthContext';
+import API_URL from '../config';
 
 const Home = () => {
     const { user } = useContext(AuthContext);
@@ -38,7 +39,7 @@ const Home = () => {
 
     const fetchServices = async () => {
         try {
-            const { data } = await axios.get('http://localhost:5001/api/services');
+            const { data } = await axios.get(`${API_URL}/services`);
             setServices(data);
             setFilteredServices(data);
             setLoading(false);

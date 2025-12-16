@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import BookingSuccess from '../components/BookingSuccess';
+import API_URL from '../config';
 
 const ServiceDetails = () => {
     const { id } = useParams();
@@ -54,7 +55,7 @@ const ServiceDetails = () => {
             // Combine date and time
             const scheduledAt = new Date(`${bookingData.date}T${convertTo24Hour(bookingData.time)}`);
 
-            await axios.post('http://localhost:5001/api/bookings', {
+            await axios.post(`${API_URL}/bookings`, {
                 serviceId: id,
                 providerId: service.providerId._id,
                 scheduledAt: scheduledAt.toISOString(),
@@ -105,8 +106,8 @@ const ServiceDetails = () => {
         const fetchData = async () => {
             try {
                 const [serviceRes, reviewsRes] = await Promise.all([
-                    axios.get(`http://localhost:5001/api/services/${id}`),
-                    axios.get(`http://localhost:5001/api/reviews/service/${id}`)
+                    axios.get(`${API_URL}/services/${id}`),
+                    axios.get(`${API_URL}/reviews/service/${id}`)
                 ]);
                 setService(serviceRes.data);
                 setReviews(reviewsRes.data);

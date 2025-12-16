@@ -3,6 +3,7 @@ import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import ServiceModal from '../components/ServiceModal';
 import { toast } from 'react-toastify';
+import API_URL from '../config';
 
 const ProviderServices = () => {
     const { user } = useContext(AuthContext);
@@ -13,7 +14,7 @@ const ProviderServices = () => {
 
     const fetchMyServices = async () => {
         try {
-            const res = await axios.get(`http://localhost:5001/api/services?provider=${user._id}`);
+            const res = await axios.get(`${API_URL}/services?provider=${user._id}`);
             setServices(res.data);
             setLoading(false);
         } catch (error) {
@@ -29,7 +30,7 @@ const ProviderServices = () => {
     const handleDelete = async (id) => {
         if (!window.confirm("Are you sure you want to delete this service?")) return;
         try {
-            await axios.delete(`http://localhost:5001/api/services/${id}`);
+            await axios.delete(`${API_URL}/services/${id}`);
             toast.success("Service deleted");
             fetchMyServices();
         } catch (error) {

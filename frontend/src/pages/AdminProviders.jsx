@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import API_URL from '../config';
 
 const AdminProviders = () => {
     const [providers, setProviders] = useState([]);
@@ -12,7 +13,7 @@ const AdminProviders = () => {
             const config = {
                 headers: { Authorization: `Bearer ${userInfo.token}` }
             };
-            const res = await axios.get('http://localhost:5001/api/admin/providers', config);
+            const res = await axios.get(`${API_URL}/admin/providers`, config);
             setProviders(res.data);
             setLoading(false);
         } catch (error) {
@@ -31,7 +32,7 @@ const AdminProviders = () => {
             const config = {
                 headers: { Authorization: `Bearer ${userInfo.token}` }
             };
-            await axios.put(`http://localhost:5001/api/admin/verify/${id}`, {}, config);
+            await axios.put(`${API_URL}/admin/verify/${id}`, {}, config);
             toast.success('Provider Verified');
             fetchProviders();
         } catch (error) {
@@ -46,7 +47,7 @@ const AdminProviders = () => {
             const config = {
                 headers: { Authorization: `Bearer ${userInfo.token}` }
             };
-            await axios.delete(`http://localhost:5001/api/admin/provider/${id}`, config);
+            await axios.delete(`${API_URL}/admin/provider/${id}`, config);
             toast.success('Provider Rejected & Removed');
             fetchProviders();
         } catch (error) {

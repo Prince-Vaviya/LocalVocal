@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { toast } from 'react-toastify';
+import API_URL from '../config';
 
 const Chat = () => {
     const { userId } = useParams(); // The user we are chatting with
@@ -44,7 +45,7 @@ const Chat = () => {
 
     const fetchConversations = async () => {
         try {
-            const res = await axios.get('http://localhost:5001/api/chat/conversations');
+            const res = await axios.get(`${API_URL}/chat/conversations`);
             setConversations(res.data);
         } catch (error) {
             console.error("Error fetching conversations", error);
@@ -59,7 +60,7 @@ const Chat = () => {
 
     const fetchMessages = async (id, background = false) => {
         try {
-            const res = await axios.get(`http://localhost:5001/api/chat/${id}`);
+            const res = await axios.get(`${API_URL}/chat/${id}`);
             // Only update if length changed or strict update needed
             // For MVP, just update state. React handles dom diffing.
             setMessages(res.data);
@@ -85,7 +86,7 @@ const Chat = () => {
             };
             setMessages(prev => [...prev, tempMsg]);
 
-            await axios.post('http://localhost:5001/api/chat', {
+            await axios.post(`${API_URL}/chat`, {
                 receiverId: userId,
                 message: msg
             });

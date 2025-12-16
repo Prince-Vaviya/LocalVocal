@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import API_URL from '../config';
 
 
 const AdminDashboard = () => {
@@ -12,7 +13,7 @@ const AdminDashboard = () => {
                 const config = {
                     headers: { Authorization: `Bearer ${userInfo.token}` }
                 };
-                const res = await axios.get('http://localhost:5001/api/admin/stats', config);
+                const res = await axios.get(`${API_URL}/admin/stats`, config);
                 setStats(res.data);
             } catch (error) {
                 console.error("Failed to fetch stats");

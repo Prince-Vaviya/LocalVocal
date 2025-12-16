@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import API_URL from '../config';
 
 const AdminReports = () => {
     const [reports, setReports] = useState([]);
@@ -12,7 +13,7 @@ const AdminReports = () => {
             const config = {
                 headers: { Authorization: `Bearer ${userInfo.token}` }
             };
-            const res = await axios.get('http://localhost:5001/api/admin/reports', config);
+            const res = await axios.get(`${API_URL}/admin/reports`, config);
             setReports(res.data);
             setLoading(false);
         } catch (error) {
@@ -31,7 +32,7 @@ const AdminReports = () => {
             const config = {
                 headers: { Authorization: `Bearer ${userInfo.token}` }
             };
-            await axios.put(`http://localhost:5001/api/admin/reports/${id}/ignore`, {}, config);
+            await axios.put(`${API_URL}/admin/reports/${id}/ignore`, {}, config);
             toast.info('Report Ignored');
             fetchReports();
         } catch (error) {
@@ -46,7 +47,7 @@ const AdminReports = () => {
             const config = {
                 headers: { Authorization: `Bearer ${userInfo.token}` }
             };
-            await axios.delete(`http://localhost:5001/api/admin/reports/${id}`, config);
+            await axios.delete(`${API_URL}/admin/reports/${id}`, config);
             toast.success('Review Deleted');
             fetchReports();
         } catch (error) {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import API_URL from '../config';
 
 const ServiceModal = ({ service, onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
@@ -32,11 +33,11 @@ const ServiceModal = ({ service, onClose, onSuccess }) => {
         try {
             if (service) {
                 // Update
-                await axios.put(`http://localhost:5001/api/services/${service._id}`, formData);
+                await axios.put(`${API_URL}/services/${service._id}`, formData);
                 toast.success('Service updated successfully');
             } else {
                 // Create
-                await axios.post('http://localhost:5001/api/services', formData);
+                await axios.post(`${API_URL}/services`, formData);
                 toast.success('Service created successfully');
             }
             onSuccess();

@@ -12,10 +12,10 @@ const Login = () => {
         e.preventDefault();
         const success = await login(email, password);
         if (success) {
-            // User redirect will be handled in App.jsx or here based on checking user role in context
-            // But context update is async, so we might check user from local storage or wait
-            // Ideally, the updated state triggers a redirect in a useEffect or we check the response data
-            navigate('/');
+            const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+            if (userInfo?.role === 'admin') navigate('/admin');
+            else if (userInfo?.role === 'provider') navigate('/provider');
+            else navigate('/profile');
         }
     };
 
